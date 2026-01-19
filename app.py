@@ -198,5 +198,3 @@ def admin_logout():
     flash('Anda telah logout!', 'info')
     return redirect(url_for('admin_login'))
 
-if __name__ == '__main__':
-    app.run(debug=True)
