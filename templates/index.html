@@ -1,0 +1,319 @@
+<!-- templates/index.html -->
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kalkulator Biaya Paket Wisata</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .top-bar {
+            max-width: 1200px;
+            margin: 0 auto 20px auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .user-info {
+            color: white;
+            font-size: 14px;
+        }
+        .menu-buttons {
+            display: flex;
+            gap: 10px;
+        }
+        .btn {
+            padding: 8px 16px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 14px;
+            cursor: pointer;
+            border: none;
+        }
+        .btn-admin {
+            background: white;
+            color: #667eea;
+        }
+        .btn-admin:hover {
+            background: #f7fafc;
+        }
+        .btn-logout {
+            background: #ff6b6b;
+            color: white;
+        }
+        .btn-logout:hover {
+            background: #ff5252;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+        label {
+            margin-bottom: 8px;
+            color: #4a5568;
+            font-weight: 500;
+        }
+        select, input {
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+        select:focus, input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        select:disabled {
+            background: #f7fafc;
+            cursor: not-allowed;
+        }
+        button[type="submit"] {
+            grid-column: 1 / -1;
+            padding: 15px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        button[type="submit"]:hover:not(:disabled) {
+            background: #5568d3;
+        }
+        button[type="submit"]:disabled {
+            background: #cbd5e0;
+            cursor: not-allowed;
+        }
+        .hasil {
+            background: #f7fafc;
+            padding: 30px;
+            border-radius: 15px;
+            margin-top: 30px;
+        }
+        .hasil.hidden {
+            display: none;
+        }
+        .hasil h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+        }
+        .ringkasan {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .total-biaya, .per-orang {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+        }
+        .total-biaya strong, .per-orang strong {
+            display: block;
+            font-size: 28px;
+            color: #667eea;
+            margin-top: 10px;
+        }
+        .rincian {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+        }
+        .rincian h3 {
+            color: #4a5568;
+            margin-bottom: 15px;
+        }
+        .rincian-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .rincian-item:last-child {
+            border-bottom: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="top-bar">
+        <div class="user-info">
+            👋 Selamat datang, {{ session.get('admin_username', 'Guest') }}!
+        </div>
+        <div class="menu-buttons">
+            <a href="{{ url_for('admin_dashboard') }}" class="btn btn-admin">⚙️ Menu Admin</a>
+            <a href="{{ url_for('admin_logout') }}" class="btn btn-logout">Logout</a>
+        </div>
+    </div>
+
+    <div class="container">
+        <h1>🚌 Kalkulator Biaya Paket Wisata</h1>
+        
+        <form id="wisataForm" class="form-grid">
+            <div class="form-group">
+                <label>Daerah Wisata:</label>
+                <select id="daerah" required>
+                    <option value="">Pilih Daerah</option>
+                    {% for daerah in daerah_wisata.keys() %}
+                    <option value="{{ daerah }}">{{ daerah }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Destinasi:</label>
+                <select id="destinasi" disabled required>
+                    <option value="">Pilih Destinasi</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Kelas Bus:</label>
+                <select id="bus" required>
+                    <option value="">Pilih Bus</option>
+                    {% for nama, harga in bus_opsi.items() %}
+                    <option value="{{ nama }}">{{ nama }} (Rp {{ harga|format_number }})</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Hotel (per malam):</label>
+                <select id="hotel" required>
+                    <option value="">Pilih Hotel</option>
+                    {% for nama, harga in hotel_opsi.items() %}
+                    <option value="{{ nama }}">{{ nama }} (Rp {{ harga|format_number }})</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Jumlah Malam:</label>
+                <input type="number" id="malam" min="1" max="10" value="2" required>
+            </div>
+
+            <div class="form-group">
+                <label>Total Peserta:</label>
+                <input type="number" id="peserta" min="1" value="10" required>
+            </div>
+
+            <button type="submit" id="hitungBtn">Hitung Total Biaya</button>
+        </form>
+
+        <div id="hasil" class="hasil hidden">
+            <h2>Hasil Perhitungan</h2>
+            <div class="ringkasan">
+                <div class="total-biaya">
+                    <span>Total Biaya:</span>
+                    <strong id="totalBiaya">Rp 0</strong>
+                </div>
+                <div class="per-orang">
+                    <span>Harga per Orang:</span>
+                    <strong id="perOrang">Rp 0</strong>
+                </div>
+            </div>
+            
+            <div class="rincian">
+                <h3>Rincian Biaya:</h3>
+                <div id="rincianList"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Data dari backend
+        const daerahWisata = {{ daerah_wisata|tojson }};
+        
+        // Update destinasi berdasarkan daerah
+        document.getElementById('daerah').addEventListener('change', function() {
+            const daerah = this.value;
+            const destinasiSelect = document.getElementById('destinasi');
+            
+            destinasiSelect.innerHTML = '<option value="">Pilih Destinasi</option>';
+            
+            if (daerah && daerahWisata[daerah]) {
+                destinasiSelect.disabled = false;
+                for (const [nama, harga] of Object.entries(daerahWisata[daerah])) {
+                    const option = document.createElement('option');
+                    option.value = nama;
+                    option.textContent = `${nama} (Rp ${harga.toLocaleString('id-ID')})`;
+                    destinasiSelect.appendChild(option);
+                }
+            } else {
+                destinasiSelect.disabled = true;
+            }
+        });
+
+        // Handle form submit
+        document.getElementById('wisataForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const data = {
+                daerah: document.getElementById('daerah').value,
+                destinasi: document.getElementById('destinasi').value,
+                bus: document.getElementById('bus').value,
+                hotel: document.getElementById('hotel').value,
+                peserta: document.getElementById('peserta').value,
+                malam: document.getElementById('malam').value
+            };
+            
+            try {
+                const response = await fetch('/calculate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                
+                const result = await response.json();
+                
+                // Tampilkan hasil
+                document.getElementById('totalBiaya').textContent = result.total;
+                document.getElementById('perOrang').textContent = result.per_orang;
+                
+                // Tampilkan rincian
+                const rincianList = document.getElementById('rincianList');
+                rincianList.innerHTML = '';
+                for (const [item, harga] of Object.entries(result.rincian)) {
+                    const div = document.createElement('div');
+                    div.className = 'rincian-item';
+                    div.innerHTML = `<span>${item}</span>`;
+                    rincianList.appendChild(div);
+                }
+                
+                document.getElementById('hasil').classList.remove('hidden');
+                document.getElementById('hasil').scrollIntoView({ behavior: 'smooth' });
+            } catch (error) {
+                alert('Terjadi kesalahan saat menghitung biaya!');
+                console.error(error);
+            }
+        });
+    </script>
+</body>
+</html>

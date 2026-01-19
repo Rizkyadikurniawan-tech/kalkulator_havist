@@ -1,0 +1,156 @@
+<!-- templates/admin_transport.html -->
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kelola Bus & Hotel</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 900px;
+            margin: 30px auto;
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        h1 { color: #333; }
+        h2 { color: #667eea; margin: 30px 0 15px 0; }
+        .btn {
+            padding: 10px 20px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 14px;
+            cursor: pointer;
+            border: none;
+            display: inline-block;
+        }
+        .btn-primary {
+            background: #667eea;
+            color: white;
+            margin-left: 10px;
+        }
+        .btn-primary:hover { background: #5568d3; }
+        .btn-danger {
+            background: #ff6b6b;
+            color: white;
+        }
+        .btn-danger:hover { background: #ff5252; }
+        .btn-secondary {
+            background: #718096;
+            color: white;
+        }
+        .btn-secondary:hover { background: #4a5568; }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 30px;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        th {
+            background: #edf2f7;
+            font-weight: 600;
+        }
+        .actions {
+            margin-top: 30px;
+        }
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚌 Kelola Bus & Hotel</h1>
+        </div>
+
+        <div class="section">
+            <div class="section-header">
+                <h2>Opsi Bus</h2>
+                <a href="{{ url_for('bus_add') }}" class="btn btn-primary">+ Tambah Bus</a>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Tipe Bus</th>
+                        <th>Harga</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for nama, harga in bus_opsi.items() %}
+                    <tr>
+                        <td>{{ nama }}</td>
+                        <td>Rp {{ "{:,}".format(harga) }}</td>
+                        <td>
+                            <a href="{{ url_for('bus_delete', nama=nama) }}" 
+                               class="btn btn-danger"
+                               onclick="return confirm('Hapus {{ nama }}?')">
+                                Hapus
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section">
+            <div class="section-header">
+                <h2>Opsi Hotel</h2>
+                <a href="{{ url_for('hotel_add') }}" class="btn btn-primary">+ Tambah Hotel</a>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Kategori Hotel</th>
+                        <th>Harga per Malam</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for nama, harga in hotel_opsi.items() %}
+                    <tr>
+                        <td>{{ nama }}</td>
+                        <td>Rp {{ "{:,}".format(harga) }}</td>
+                        <td>
+                            <a href="{{ url_for('hotel_delete', nama=nama) }}" 
+                               class="btn btn-danger"
+                               onclick="return confirm('Hapus {{ nama }}?')">
+                                Hapus
+                            </a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="actions">
+            <a href="{{ url_for('admin_dashboard') }}" class="btn btn-secondary">← Kembali ke Dashboard</a>
+        </div>
+    </div>
+</body>
+</html>
